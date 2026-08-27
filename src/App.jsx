@@ -137,7 +137,7 @@ function Footer() {
       <FooterList title="Послуги" links={serviceCards.map((item) => [item.title, `/services/${item.slug}`])} />
       <div className="footer__contacts"><h3>Контакти</h3><a href={contact.phoneHref}><Phone />{contact.phone}</a><a href={`mailto:${contact.email}`}><Mail />{contact.email}</a><span><MapPin />{contact.address}</span><a href="https://t.me/kyivlegalgroup"><Send />Telegram: {contact.telegram}</a></div>
     </div>
-    <div className="shell footer__bottom"><span>© 2024 Kyiv Legal Group. Усі права захищені.</span><span><Link to="/privacy">Політика конфіденційності</Link><i /> <Link to="/offer">Публічна оферта</Link></span></div>
+    <div className="shell footer__bottom"><span>© 2026 Kyiv Legal Group. Усі права захищені.</span><span><Link to="/privacy">Політика конфіденційності</Link><i /> <Link to="/offer">Публічна оферта</Link></span></div>
   </footer>
 }
 
@@ -197,7 +197,15 @@ function FounderBanner({ long = false }) {
 
 function FaqAccordion({ items = faqs }) {
   const [open, setOpen] = useState(0)
-  return <div className="faq-list">{items.map(([question, answer], index) => <article className="faq-item" key={question}><button onClick={() => setOpen(open === index ? -1 : index)} aria-expanded={open === index}><span>{question}</span><ChevronDown /></button>{open === index && <div className="faq-item__answer"><p>{answer}</p></div>}</article>)}</div>
+  return <div className="faq-list">{items.map(([question, answer], index) => {
+    const isOpen = open === index
+    return <article className={`faq-item ${isOpen ? 'faq-item--open' : ''}`} key={question}>
+      <button onClick={() => setOpen(isOpen ? -1 : index)} aria-expanded={isOpen}>
+        <span>{question}</span><ChevronDown />
+      </button>
+      <div className="faq-item__panel"><div className="faq-item__answer"><p>{answer}</p></div></div>
+    </article>
+  })}</div>
 }
 
 function Testimonial({ name, role, text, tiny = false }) {
@@ -296,7 +304,7 @@ function AboutPage() {
     <section className="section shell split-mission"><div><h2>Наша філософія<br />та місія</h2><p>Kyiv Legal Group створена з вірою в силу права та відповідальність перед кожним клієнтом.</p><p>Наша місія — надавати правові рішення, які захищають інтереси клієнтів сьогодні та створюють основу для їхнього майбутнього.</p><p>Ми прагнемо бути не просто юридичним радником, а надійним партнером, який розуміє вашу справу та діє в інтересах вашого бізнесу.</p><Link className="btn btn--outline" to="/services">Дізнатися більше про наші послуги</Link></div><div className="grid grid--2">{[[UsersRound, 'Клієнтоорієнтованість', 'Розуміємо ваші цілі та пропонуємо рішення, що працюють для вас.'], [BadgeCheck, 'Професіоналізм', 'Глибокі знання права та постійне підвищення експертизи команди.'], [LockKeyhole, 'Конфіденційність', 'Гарантуємо повний захист інформації та приватності клієнта.'], [Target, 'Результативність', 'Фокус на досягненні конкретного, вимірюваного результату.']].map(([icon, title, text]) => <FeatureCard key={title} icon={icon} title={title} text={text} />)}</div></section>
     <section className="section shell"><FounderBanner long /></section>
     <section className="section shell"><SectionHeading>Наші цінності</SectionHeading><div className="grid grid--4">{values.map(([icon, title, text]) => <FeatureCard key={title} icon={icon} title={title} text={text} />)}</div></section>
-    <section className="section shell"><SectionHeading>Наш шлях</SectionHeading><div className="timeline">{[['2012', 'Заснування Kyiv Legal Group. Початок роботи з корпоративними клієнтами та приватними особами.'], ['2016', 'Розширення практик та команди. Визнання на ринку та зростання кількості успішних проєктів.'], ['2020', 'Запуск нових напрямів: податкове консультування та міжнародне право.'], ['2024', 'Вихід на новий рівень сервісу. Посилення експертизи та партнерської мережі.']].map(([year, text]) => <article key={year}><b>{year}</b><span /><p>{text}</p></article>)}</div></section>
+    <section className="section shell"><SectionHeading>Наш шлях</SectionHeading><div className="timeline">{[['2012', 'Заснування Kyiv Legal Group. Початок роботи з корпоративними клієнтами та приватними особами.'], ['2016', 'Розширення практик та команди. Визнання на ринку та зростання кількості успішних проєктів.'], ['2020', 'Запуск нових напрямів: податкове консультування та міжнародне право.'], ['2026', 'Вихід на новий рівень сервісу. Посилення експертизи та партнерської мережі.']].map(([year, text]) => <article key={year}><b>{year}</b><span /><p>{text}</p></article>)}</div></section>
     <section className="section shell"><SectionHeading>Наша команда</SectionHeading><div className="grid grid--3">{team.map(([name, role], index) => <article className="team-card" key={name}><img src={portrait} alt="" style={{ objectPosition: `${50 + index * 8}% 32%` }} /><div><h3>{name}</h3><p>{role}</p><small>{index === 0 ? '15+ років досвіду у супроводі бізнесу, M&A та корпоративних структурах.' : index === 1 ? 'Спеціаліст із вирішення складних господарських та комерційних спорів у судах.' : 'Експерт у податковому плануванні, супроводі перевірок та оскарженні податкових рішень.'}</small></div></article>)}</div></section>
     <section className="section shell"><SectionHeading>Наші компетенції</SectionHeading><div className="competencies"><span><Scale />Асоціація правників України</span><span><ShieldCheck />The Law Society of Ukraine</span><span><Building2 />EUCON LEGAL GROUP</span><span><BadgeCheck />ISO 9001:2015</span><span><Star />Визнання клієнтів 4.9/5</span></div></section><section className="shell section"><CtaBand title="Готові працювати з командою, що захищає ваш успіх?" /></section>
   </Layout>
@@ -387,7 +395,7 @@ const legalOffer = [
   ['Реквізити виконавця', 'ТОВ «Kyiv Legal Group». Код ЄДРПОУ: 45678901. Юридична адреса: м. Київ, вул. Велика Васильківська, 72.'],
 ]
 
-function LegalHero({ title, breadcrumb, date }) { return <section className="legal-hero"><div className="shell"><div><h1>{title}</h1><p className="breadcrumbs">Головна <ChevronRight /> {breadcrumb}</p>{date && <p className="updated"><CalendarDays />Останнє оновлення: 30 квітня 2024 року</p>}</div><div className="legal-hero__art"><img src={portrait} alt="" /></div></div></section> }
+function LegalHero({ title, breadcrumb, date }) { return <section className="legal-hero"><div className="shell"><div><h1>{title}</h1><p className="breadcrumbs">Головна <ChevronRight /> {breadcrumb}</p>{date && <p className="updated"><CalendarDays />Останнє оновлення: 30 квітня 2026 року</p>}</div><div className="legal-hero__art"><img src={portrait} alt="" /></div></div></section> }
 
 function LegalPage({ type }) {
   const isPrivacy = type === 'privacy'; const title = isPrivacy ? 'Політика\nконфіденційності' : 'Публічна оферта'; const sections = isPrivacy ? legalPrivacy : legalOffer
