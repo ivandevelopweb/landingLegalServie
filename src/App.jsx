@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Link, NavLink, Route, Routes } from 'react-router-dom'
+import { Link, NavLink, Route, Routes, useParams } from 'react-router-dom'
 import {
   ArrowRight, Award, BadgeCheck, BriefcaseBusiness, Building2, CalendarDays,
   CarFront, Check, ChevronDown, ChevronRight, CircleCheck, CircleDollarSign,
@@ -34,24 +34,28 @@ const contact = {
 
 const serviceCards = [
   {
+    slug: 'consultation',
     icon: MessagesSquare,
     title: 'Юридична консультація',
     text: 'Надаємо чіткі та зрозумілі відповіді на правові питання та допомагаємо знайти оптимальне рішення.',
     bullets: ['Усна та письмова консультація', 'Правовий аналіз ситуації', 'Роз’яснення законодавства', 'Оцінка ризиків та перспектив'],
   },
   {
+    slug: 'contracts',
     icon: FilePenLine,
     title: 'Складання договорів',
     text: 'Розробляємо договори, що враховують ваші інтереси та мінімізують юридичні ризики.',
     bullets: ['Договори для бізнесу та ФОП', 'Аналіз та перевірка договорів', 'Узгодження умов з партнерами', 'Типові та індивідуальні договори'],
   },
   {
+    slug: 'business-support',
     icon: BriefcaseBusiness,
     title: 'Супровід бізнесу',
     text: 'Комплексний юридичний супровід діяльності компаній — від реєстрації до розвитку.',
     bullets: ['Корпоративне право', 'Договірна та претензійна робота', 'Трудові відносини', 'Податкове консультування'],
   },
   {
+    slug: 'litigation',
     icon: Landmark,
     title: 'Представництво в суді',
     text: 'Ефективний захист ваших інтересів у судах усіх інстанцій.',
@@ -67,6 +71,37 @@ const faqs = [
   ['Чи гарантуєте ви конфіденційність?', 'Так, конфіденційність усієї інформації та документів є базовим принципом нашої роботи.'],
 ]
 
+const serviceDetails = {
+  consultation: {
+    ctaHeading: 'Потрібна юридична консультація?',
+    lead: 'Розбираємо вашу ситуацію простою мовою та даємо зрозумілий план дій — без зайвої теорії й невизначеності.',
+    outcomes: ['Аналіз документів і фактів', 'Відповіді на ключові правові питання', 'Оцінка ризиків та перспектив', 'Чіткі рекомендації наступних кроків'],
+    stages: ['Знайомимося із запитом', 'Вивчаємо обставини й документи', 'Проводимо консультацію', 'Формуємо план дій'],
+    note: 'Консультація доступна в офісі, телефоном або онлайн.',
+  },
+  contracts: {
+    ctaHeading: 'Потрібне складання договорів?',
+    lead: 'Готуємо договори, які захищають ваші інтереси, зменшують ризики та залишають умови співпраці зрозумілими для всіх сторін.',
+    outcomes: ['Індивідуальна структура документа', 'Перевірка істотних умов і ризиків', 'Узгодження правок із контрагентом', 'Практичні пояснення кожного пункту'],
+    stages: ['Збираємо вихідні дані', 'Готуємо або перевіряємо договір', 'Узгоджуємо коментарі сторін', 'Передаємо фінальну редакцію'],
+    note: 'Працюємо з разовими договорами та комплексними пакетами документів.',
+  },
+  'business-support': {
+    ctaHeading: 'Потрібен супровід бізнесу?',
+    lead: 'Беремо на себе юридичні завдання бізнесу, щоб команда могла зосередитися на розвитку, а не на ризиках і документах.',
+    outcomes: ['Постійна юридична підтримка', 'Договори, претензії та корпоративні питання', 'Супровід кадрових і податкових процесів', 'Попередження ризиків до їх появи'],
+    stages: ['Визначаємо потреби бізнесу', 'Узгоджуємо формат супроводу', 'Підключаємося до процесів', 'Регулярно звітуємо про результат'],
+    note: 'Формат і кількість годин підбираємо під розмір та задачі вашої компанії.',
+  },
+  litigation: {
+    ctaHeading: 'Потрібне представництво в суді?',
+    lead: 'Захищаємо ваші інтереси в суді системно: від оцінки перспектив справи до виконання рішення.',
+    outcomes: ['Правова позиція та стратегія спору', 'Підготовка процесуальних документів', 'Представництво на всіх етапах', 'Контроль виконання судового рішення'],
+    stages: ['Аналізуємо матеріали справи', 'Будуємо правову позицію', 'Представляємо ваші інтереси', 'Супроводжуємо до результату'],
+    note: 'Попередньо чесно оцінюємо перспективи та можливі витрати у справі.',
+  },
+}
+
 function Brand({ light = false }) {
   return <Link className={`brand ${light ? 'brand--light' : ''}`} to="/" aria-label="Kyiv Legal Group — головна">
     <span className="brand__mark"><Scale size={30} strokeWidth={1.25} /><b>KG</b></span>
@@ -76,12 +111,17 @@ function Brand({ light = false }) {
 
 function Header() {
   const [open, setOpen] = useState(false)
+  const [servicesOpen, setServicesOpen] = useState(false)
+  const closeNavigation = () => { setOpen(false); setServicesOpen(false) }
   return <header className="site-header">
     <div className="shell header__inner">
       <Brand />
       <nav className={`nav ${open ? 'nav--open' : ''}`} aria-label="Основна навігація">
-        {navLinks.map(([label, href]) => <NavLink key={href} to={href} onClick={() => setOpen(false)} className={({ isActive }) => isActive ? 'active' : ''}>{label}</NavLink>)}
-        <Link className="nav__mobile-cta" to="/contacts#form" onClick={() => setOpen(false)}>Отримати консультацію</Link>
+        {navLinks.map(([label, href]) => label === 'Послуги' ? <div className={`nav__item nav__item--services ${servicesOpen ? 'nav__item--open' : ''}`} key={href} onMouseEnter={() => setServicesOpen(true)} onMouseLeave={() => setServicesOpen(false)} onFocusCapture={() => setServicesOpen(true)} onBlur={(event) => { if (!event.currentTarget.contains(event.relatedTarget)) setServicesOpen(false) }}>
+          <NavLink to={href} onClick={closeNavigation} aria-haspopup="menu" aria-expanded={servicesOpen} className={({ isActive }) => `nav__link ${isActive ? 'active' : ''}`}>Послуги <ChevronDown /></NavLink>
+          <div className="services-menu" aria-label="Послуги Kyiv Legal Group" aria-hidden={!servicesOpen}>{serviceCards.map((service) => { const Icon = service.icon; return <Link to={`/services/${service.slug}`} key={service.slug} onClick={closeNavigation} tabIndex={servicesOpen ? 0 : -1}><Icon /><span><b>{service.title}</b><small>{service.text}</small></span><ArrowRight /></Link> })}</div>
+        </div> : <NavLink key={href} to={href} onClick={closeNavigation} className={({ isActive }) => isActive ? 'active' : ''}>{label}</NavLink>)}
+        <Link className="nav__mobile-cta" to="/contacts#form" onClick={closeNavigation}>Отримати консультацію</Link>
       </nav>
       <Link className="btn btn--outline header__cta" to="/contacts#form">Отримати консультацію</Link>
       <button className="menu-toggle" aria-label={open ? 'Закрити меню' : 'Відкрити меню'} aria-expanded={open} onClick={() => setOpen(!open)}>{open ? <X /> : <Menu />}</button>
@@ -94,7 +134,7 @@ function Footer() {
     <div className="shell footer__grid">
       <div className="footer__identity"><Brand light /><p>Надійний правовий супровід для вашого бізнесу та особистих справ у Києві та по всій Україні.</p><div className="socials"><span>f</span><span>in</span><span>◎</span><span>◉</span></div></div>
       <FooterList title="Швидкі посилання" links={navLinks} />
-      <FooterList title="Послуги" links={serviceCards.map((item) => [item.title, '/services'])} />
+      <FooterList title="Послуги" links={serviceCards.map((item) => [item.title, `/services/${item.slug}`])} />
       <div className="footer__contacts"><h3>Контакти</h3><a href={contact.phoneHref}><Phone />{contact.phone}</a><a href={`mailto:${contact.email}`}><Mail />{contact.email}</a><span><MapPin />{contact.address}</span><a href="https://t.me/kyivlegalgroup"><Send />Telegram: {contact.telegram}</a></div>
     </div>
     <div className="shell footer__bottom"><span>© 2024 Kyiv Legal Group. Усі права захищені.</span><span><Link to="/privacy">Політика конфіденційності</Link><i /> <Link to="/offer">Публічна оферта</Link></span></div>
@@ -113,14 +153,14 @@ function Stats() {
   return <div className="stats">{stats.map(({ icon: Icon, value, label }) => <div className="stat" key={value}><Icon /><div><b>{value}</b><small>{label}</small></div></div>)}</div>
 }
 
-function Hero({ title, eyebrow, intro, action = true, secondAction, compact = false }) {
+function Hero({ title, eyebrow, intro, action = true, actionHref = '/contacts#form', actionExternal = false, secondAction, compact = false }) {
   return <section className={`hero ${compact ? 'hero--compact' : ''}`}>
     <div className="shell hero__inner">
       <div className="hero__copy">
         {eyebrow && <span className="eyebrow">{eyebrow}</span>}
         <h1>{title}</h1>
         {intro && <p>{intro}</p>}
-        {action && <div className="hero__actions"><Link className="btn" to="/contacts#form">{action === true ? 'Записатися на консультацію' : action}</Link>{secondAction && <Link className="btn btn--ghost" to={secondAction.href}>{secondAction.label}</Link>}</div>}
+        {action && <div className="hero__actions">{actionExternal ? <a className="btn" href={actionHref}>{action === true ? 'Записатися на консультацію' : action}</a> : <Link className="btn" to={actionHref}>{action === true ? 'Записатися на консультацію' : action}</Link>}{secondAction && (secondAction.external ? <a className="btn btn--ghost" href={secondAction.href}>{secondAction.label}</a> : <Link className="btn btn--ghost" to={secondAction.href}>{secondAction.label}</Link>)}</div>}
         <Stats />
       </div>
       <div className="hero__art" aria-hidden="true"><img src={portrait} alt="" /></div>
@@ -144,7 +184,7 @@ function ServiceCard({ item, detailed = false }) {
     <span className="card-rule" />
     <p>{item.text}</p>
     {detailed && <ul>{item.bullets.map((bullet) => <li key={bullet}>{bullet}</li>)}</ul>}
-    {detailed ? <Link className="btn btn--outline btn--full" to="/contacts#form">Детальніше про послугу</Link> : null}
+    {detailed ? <Link className="btn btn--outline btn--full" to={`/services/${item.slug}`}>Детальніше про послугу</Link> : <Link className="service-card__link" to={`/services/${item.slug}`}>Детальніше <ArrowRight /></Link>}
   </article>
 }
 
@@ -166,16 +206,23 @@ function Testimonial({ name, role, text, tiny = false }) {
 
 function QuoteMark() { return <span className="quote-mark">“</span> }
 
-function ConsultationForm({ compact = false }) {
+function ConsultationForm({ defaultTopic = '' }) {
   const [sent, setSent] = useState(false)
   const [error, setError] = useState('')
-  const submit = (event) => { event.preventDefault(); const form = new FormData(event.currentTarget); if (![...form.values()].every(Boolean)) { setError('Будь ласка, заповніть усі обов’язкові поля.'); return } setError(''); setSent(true); event.currentTarget.reset() }
+  const submit = (event) => {
+    event.preventDefault()
+    const values = Object.fromEntries(new FormData(event.currentTarget))
+    if (!Object.values(values).every(Boolean)) { setError('Будь ласка, заповніть усі обов’язкові поля.'); return }
+    if (!/^\S+@\S+\.\S+$/.test(values.email)) { setError('Введіть коректну email-адресу.'); return }
+    if ((values.phone.match(/\d/g) || []).length < 10) { setError('Введіть коректний номер телефону.'); return }
+    setError(''); setSent(true); event.currentTarget.reset()
+  }
   if (sent) return <div className="form-success"><CircleCheck /><h3>Дякуємо за звернення</h3><p>Ми зв’яжемося з вами найближчим часом.</p><button className="text-button" onClick={() => setSent(false)}>Надіслати ще одну заявку</button></div>
-  return <form className={`consultation-form ${compact ? 'consultation-form--compact' : ''}`} onSubmit={submit} noValidate>
+  return <form className="consultation-form" onSubmit={submit} noValidate>
     <div className="form-grid"><label>Ваше ім’я*<input required name="name" placeholder="Наприклад: Олена" /></label><label>Телефон*<input required name="phone" type="tel" placeholder="+380 (__) ___ __ __" /></label></div>
     <label>Email*<input required name="email" type="email" placeholder="your@email.com" /></label>
-    {!compact && <label>Тема звернення<select defaultValue=""><option value="" disabled>Оберіть тему</option><option>Юридична консультація</option><option>Складання договорів</option><option>Супровід бізнесу</option><option>Представництво в суді</option></select></label>}
-    <label>Коротко опишіть вашу ситуацію*<textarea required name="message" placeholder="Опишіть суть питання" rows={compact ? 2 : 4} /></label>
+    <label>Тема звернення*<select required name="topic" defaultValue={defaultTopic}><option value="" disabled>Оберіть тему</option>{serviceCards.map((service) => <option key={service.slug} value={service.title}>{service.title}</option>)}</select></label>
+    <label>Коротко опишіть вашу ситуацію*<textarea required name="message" placeholder="Опишіть суть питання" rows={4} /></label>
     <label className="consent"><input required name="consent" type="checkbox" /><span>Я погоджуюсь на обробку персональних даних</span></label>
     {error && <p className="form-error" role="alert">{error}</p>}<button className="btn btn--full" type="submit">Надіслати заявку</button><small className="form-note"><LockKeyhole /> Ваші дані в безпеці та не передаються третім особам</small>
   </form>
@@ -193,7 +240,7 @@ function HomePage() {
     <section className="section shell"><SectionHeading>Чому клієнти обирають нас</SectionHeading><div className="grid grid--4"><FeatureCard icon={CircleDollarSign} title="Прозоре ціноутворення" text="Чіткі умови та фіксована вартість без прихованих платежів." /><FeatureCard icon={Zap} title="Швидка реакція" text="Оперативно відповідаємо на запити та беремося до справ у найкоротші терміни." /><FeatureCard icon={Target} title="Персональна стратегія" text="Розробляємо індивідуальний план дій, орієнтований на результат." /><FeatureCard icon={LockKeyhole} title="Повна конфіденційність" text="Гарантуємо захист ваших даних та ділової інформації." /></div></section>
     <section className="section shell"><SectionHeading>Як ми працюємо</SectionHeading><div className="process"><ProcessStep n="1" title="Заявка" text="Залишаєте заявку або дзвоните нам для первинної консультації." /><ProcessStep n="2" title="Аналіз ситуації" text="Вивчаємо ваш запит, аналізуємо документи та обставини справи." /><ProcessStep n="3" title="Стратегія" text="Пропонуємо оптимальне рішення та узгоджуємо план дій." /><ProcessStep n="4" title="Супровід до результату" text="Реалізуємо стратегію та супроводжуємо вас до досягнення результату." /></div></section>
     <section className="section shell"><SectionHeading>Відгуки клієнтів</SectionHeading><div className="grid grid--3"><Testimonial name="Андрій Мельник" role="Директор, ТОВ «Будівництво»" text="Дякую команді Kyiv Legal Group за професіоналізм та уважність. Допомогли вирішити складний комерційний спір у найкоротші терміни." tiny /><Testimonial name="Ірина Довженко" role="CEO, IT-компанія «SoftLine»" text="Олена та її команда супроводжують нашу компанію вже понад рік. Завжди на зв’язку та пропонують дієві рішення." tiny /><Testimonial name="Максим Гончар" role="Підприємець" text="Професійна підтримка у судовій справі — від початку до завершення. Рекомендую як надійного партнера." tiny /></div></section>
-    <section className="section section--consult" id="consultation"><div className="shell consultation-layout"><ContactPanel /><div className="form-card"><SectionHeading>Отримайте консультацію</SectionHeading><ConsultationForm compact /></div><aside className="schedule-card"><CalendarDays /><h3>Зручний час для розмови?</h3><p>Ми передзвонимо вам у найближчий робочий час.</p><Link className="btn btn--outline" to="/contacts">Замовити дзвінок</Link></aside></div></section>
+    <section className="section section--consult" id="consultation"><div className="shell consultation-layout"><ContactPanel /><div className="form-card"><SectionHeading>Отримайте консультацію</SectionHeading><ConsultationForm /></div><aside className="schedule-card"><CalendarDays /><h3>Зручний час для розмови?</h3><p>Ми передзвонимо вам у найближчий робочий час.</p><Link className="btn btn--outline" to="/contacts#form">Замовити дзвінок</Link></aside></div></section>
   </Layout>
 }
 
@@ -207,6 +254,24 @@ function ServicesPage() {
     <section className="section shell"><SectionHeading>Наші послуги</SectionHeading><div className="grid grid--4">{serviceCards.map((item) => <ServiceCard detailed item={item} key={item.title} />)}</div></section>
     <section className="section shell"><SectionHeading>Формати співпраці та вартість</SectionHeading><div className="grid grid--3 pricing">{prices.map((item) => <article className="price-card" key={item.title}>{item.popular && <span className="popular">Найпопулярніше</span>}<item.icon /><h3>{item.title}</h3><b>{item.price}</b><p>{item.text}</p><ul>{item.bullets.map((bullet) => <li key={bullet}>{bullet}</li>)}</ul><Link className="btn btn--outline btn--full" to="/contacts#form">{item.title === 'Разова консультація' ? 'Замовити консультацію' : 'Обговорити умови'}</Link></article>)}</div><p className="price-note"><Info /> Вартість залежить від складності справи та обсягу робіт. Точну ціну визначаємо після первинної консультації.</p></section>
     <section className="section shell"><SectionHeading>Поширені запитання</SectionHeading><FaqAccordion /></section><section className="shell section"><CtaBand /></section>
+  </Layout>
+}
+
+function ServiceDetailPage() {
+  const { slug } = useParams()
+  const service = serviceCards.find((item) => item.slug === slug)
+  const detail = service && serviceDetails[slug]
+  if (!service || !detail) return <NotFound />
+  const Icon = service.icon
+  return <Layout>
+    <Hero title={service.title} eyebrow="Послуги Kyiv Legal Group" intro={detail.lead} action="Обговорити вашу ситуацію" compact />
+    <section className="section shell service-detail-overview">
+      <div className="service-detail-overview__intro"><Icon /><div><span className="eyebrow">Що входить у послугу</span><h2>Практичне рішення для вашої ситуації</h2><p>{service.text}</p><p>{detail.note}</p></div></div>
+      <div className="grid grid--2">{detail.outcomes.map((outcome, index) => <FeatureCard key={outcome} icon={[BadgeCheck, ShieldCheck, Target, CircleCheck][index]} title={outcome} text={index === 0 ? 'Працюємо з фактами, документами та цілями саме вашої справи.' : index === 1 ? 'Пояснюємо юридичну частину зрозуміло й без складних формулювань.' : index === 2 ? 'Будуємо рішення так, щоб зменшити ризики для вас або бізнесу.' : 'Залишаємо чіткий результат, з яким можна рухатися далі.'} />)}</div>
+    </section>
+    <section className="section shell"><SectionHeading>Як відбувається робота</SectionHeading><div className="service-detail-process">{detail.stages.map((stage, index) => <article key={stage}><span>{index + 1}</span><h3>{stage}</h3><p>{index === 0 ? 'Уточнюємо деталі, строк і бажаний результат.' : index === 1 ? 'Підбираємо правові інструменти та перевіряємо ризики.' : index === 2 ? 'Погоджуємо кроки та тримаємо вас у курсі процесу.' : 'Передаємо результат і лишаємося на зв’язку.'}</p></article>)}</div></section>
+    <section className="section shell service-detail-cta"><div><h2>{detail.ctaHeading}</h2><p>Залиште заявку — юрист зв’яжеться з вами у робочий час та уточнить деталі.</p><div className="service-detail-cta__contacts"><a href={contact.phoneHref}><Phone />{contact.phone}</a><a href={`mailto:${contact.email}`}><Mail />{contact.email}</a></div></div><div className="form-card" id="form"><SectionHeading>Отримайте консультацію</SectionHeading><ConsultationForm defaultTopic={service.title} /></div></section>
+    <section className="section shell"><SectionHeading>Інші послуги</SectionHeading><div className="grid grid--3">{serviceCards.filter((item) => item.slug !== slug).map((item) => <ServiceCard key={item.slug} item={item} />)}</div></section>
   </Layout>
 }
 
@@ -230,15 +295,23 @@ function AdvantagesPage() {
     <section className="section shell"><SectionHeading>Що нас відрізняє</SectionHeading><div className="grid grid--3">{features.map(([icon, title, text]) => <FeatureCard key={title} icon={icon} title={title} text={text} />)}</div></section>
     <section className="section shell"><SectionHeading>Чому ми vs типові юридичні послуги</SectionHeading><div className="comparison"><div><h3>Kyiv Legal Group</h3>{['Персональний підхід до кожного клієнта', 'Прозора комунікація та зрозумілі кроки', 'Орієнтація на результат і захист інтересів', 'Проактивні рішення та мінімізація ризиків', 'Постійна підтримка на кожному етапі'].map((item) => <p key={item}><CircleCheck />{item}</p>)}</div><div><h3>Типові юридичні послуги</h3>{['Шаблонний підхід без урахування деталей', 'Непрозорі умови та додаткові витрати', 'Фокус на процесі, а не на результаті', 'Реакція на проблеми, а не їх запобігання', 'Обмежений супровід та нерегулярна комунікація'].map((item) => <p key={item}><X />{item}</p>)}</div></div></section>
     <section className="section shell"><SectionHeading>Наші результати в цифрах</SectionHeading><div className="results-strip">{[[ShieldCheck, '450+', 'успішних справ'], [UsersRound, '230+', 'клієнтів довіряють нам'], [Clock3, '<24 год', 'середній час відповіді'], [Gavel, '92%', 'виграних справ'], [Star, '4.9/5', 'середній рейтинг клієнтів']].map(([icon, value, label]) => <div key={value}><span>{typeof icon === 'function' && null}</span>{(() => { const Icon = icon; return <Icon /> })()}<b>{value}</b><small>{label}</small></div>)}</div></section>
-    <section className="section shell"><SectionHeading>Приклади успішних кейсів</SectionHeading><div className="grid grid--3">{cases.map(([tag, title, text, result]) => <article className="case-card" key={title}><span>{tag}</span><h3>{title}</h3><p>{text}</p><b>Результат:</b><p>{result}</p><Link to="/contacts">Детальніше <ArrowRight /></Link></article>)}</div></section>
+    <section className="section shell"><SectionHeading>Приклади успішних кейсів</SectionHeading><div className="grid grid--3">{cases.map(([tag, title, text, result]) => <article className="case-card" key={title}><span>{tag}</span><h3>{title}</h3><p>{text}</p><b>Результат:</b><p>{result}</p><Link to="/contacts#form">Детальніше <ArrowRight /></Link></article>)}</div></section>
     <section className="section shell"><div className="wide-quote"><QuoteMark /><div><p>Команда Kyiv Legal Group — це поєднання професіоналізму, швидкості та людяного підходу. Завжди відчуваємо себе в надійних руках.</p><b>Андрій Мельник</b><small>Директор, ТОВ «Логістик Груп»</small></div><span className="stars">★★★★★</span></div></section><section className="section shell"><CtaBand title="Готові працювати з командою, що захищає ваш успіх?" /></section>
   </Layout>
 }
 
 function ReviewsPage() {
+  const [featuredIndex, setFeaturedIndex] = useState(0)
   const reviews = [['Ірина Левченко', 'Власниця IT-компанії', 'Команда Kyiv Legal Group супроводжувала нас під час виходу на новий ринок. Все чітко, прозоро і вчасно. Результатом задоволена.'], ['Олександр Ткаченко', 'Генеральний директор', 'Дякуємо за успішний супровід договорів та захист інтересів у складних переговорах. Відчувається досвід і стратегічний підхід.'], ['Марія Ковальчук', 'Приватний клієнт', 'Отримала професійну підтримку у сімейному питанні. Дуже делікатно, з розумінням і реальним результатом.'], ['Дмитро Бондар', 'Власник стартапу', 'Юристи, які справді розбираються у бізнесі та думають як надійний партнер. Допомогли уникнути ризиків.'], ['Наталія Гончар', 'Фінансовий директор', 'Професійна команда, яка швидко знаходить рішення навіть у найскладніших ситуаціях. Завжди на зв’язку та в курсі справи.'], ['Віталій Савчук', 'Власник виробництва', 'Супровід перевірки та вирішення спору з контролюючими органами пройшли успішно. Дякую за компетентність.'], ['Олена Романюк', 'Приватний клієнт', 'Допомогли з оформленням нерухомості та захистом моїх прав. Усе зрозуміло, спокійно і без зайвої бюрократії.'], ['Сергій Мельник', 'CEO логістичної компанії', 'Надійний партнер для бізнесу. Супроводжують нас уже не перший рік. Цінуємо за якість, оперативність і результат.']]
+  const featured = [
+    ['Андрій Нікітюк', 'Власник бізнесу', 'Професіоналізм, глибоке розуміння права та щира турбота про клієнта — саме те, що вирізняє Kyiv Legal Group.', 'Команда не просто вирішує юридичні питання, а стає надійним партнером у найважливіші моменти. Рекомендую всім, хто цінує результат і спокій.'],
+    ['Ірина Довженко', 'CEO, IT-компанія «SoftLine»', 'Юристи працюють швидко, дуже уважно до деталей і пропонують варіанти, які дійсно можна застосувати в бізнесі.', 'Наша команда отримує своєчасні відповіді та зрозумілий план дій з кожного питання.'],
+    ['Максим Гончар', 'Підприємець', 'Надійні партнери у складній судовій справі — від першої зустрічі до фінального рішення.', 'Ціную чесну оцінку перспектив, оперативність та повний контроль процесу.'],
+  ]
+  const [name, role, quote, text] = featured[featuredIndex]
+  const moveFeatured = (direction) => setFeaturedIndex((current) => (current + direction + featured.length) % featured.length)
   return <Layout><Hero title="Відгуки клієнтів" intro="Реальний досвід співпраці та довіра, що підтверджує наш професіоналізм." action="Отримати консультацію" secondAction={{ label: 'Наші послуги', href: '/services' }} compact />
-    <section className="section shell"><div className="review-feature"><button aria-label="Попередній відгук"><ChevronRight /></button><div><QuoteMark /><blockquote>Професіоналізм, глибоке розуміння права та щира турбота про клієнта — саме те, що вирізняє Kyiv Legal Group.</blockquote><p>Команда не просто вирішує юридичні питання, а стає надійним партнером у найважливіші моменти. Рекомендую всім, хто цінує результат і спокій.</p><div className="review-feature__person"><div className="avatar">АН</div><span><b>Андрій Нікітюк</b><small>Власник бізнесу</small></span><strong className="stars">★★★★★</strong></div></div><aside><small>Середня оцінка<br />наших клієнтів</small><b>4.9</b><span className="stars">★★★★★</span><small>на основі 128 відгуків</small><Link className="btn btn--outline" to="/contacts#form">Залишити відгук</Link></aside><button aria-label="Наступний відгук"><ChevronRight /></button></div></section>
+    <section className="section shell"><div className="review-feature"><button aria-label="Попередній відгук" onClick={() => moveFeatured(-1)}><ChevronRight /></button><div className="review-feature__content" key={name}><QuoteMark /><blockquote>{quote}</blockquote><p>{text}</p><div className="review-feature__person"><div className="avatar">{name.split(' ').map((part) => part[0]).join('')}</div><span><b>{name}</b><small>{role}</small></span><strong className="stars">★★★★★</strong></div></div><aside><small>Середня оцінка<br />наших клієнтів</small><b>4.9</b><span className="stars">★★★★★</span><small>на основі 128 відгуків</small><Link className="btn btn--outline" to="/contacts#form">Залишити відгук</Link></aside><button aria-label="Наступний відгук" onClick={() => moveFeatured(1)}><ChevronRight /></button></div></section>
     <section className="section shell"><SectionHeading>Відгуки наших клієнтів</SectionHeading><div className="grid grid--4 reviews-grid">{reviews.map(([name, role, text]) => <Testimonial key={name} name={name} role={role} text={text} tiny />)}</div></section>
     <section className="section shell"><SectionHeading>Наші результати — ваша впевненість</SectionHeading><div className="results-strip results-strip--four">{[[Landmark, 'Стягнення боргу', '9,200,000 грн', 'Повністю задоволено позовні вимоги'], [BadgeCheck, 'Податковий спір', '3,5 млн грн', 'Економія для клієнта'], [Target, 'Захист бізнесу', 'Успішно', 'Перевірку ДФС без штрафних санкцій'], [Building2, 'Реєстрація компанії', '3 дні', 'Від ідеї до реєстрації під ключ']].map(([icon, title, value, label]) => { const Icon = icon; return <div key={title}><Icon /><small>{title}</small><b>{value}</b><small>{label}</small></div> })}</div></section>
     <section className="section shell"><SectionHeading>Нам довіряють</SectionHeading><div className="trust-row">{[['TechNova', 'IT Solutions'], ['BuildCore', 'Будівельна компанія'], ['AgroVision', 'Агрохолдинг'], ['Fintegra', 'Фінансові рішення'], ['Medicus', 'Медичний центр'], ['LogiTrans', 'Логістична компанія']].map(([name, type]) => <div key={name}><b>{name}</b><small>{type}</small></div>)}</div></section><section className="section shell"><CtaBand /></section>
@@ -247,10 +320,10 @@ function ReviewsPage() {
 
 function ContactsPage() {
   const contactFaq = [['Як швидко ви відповідаєте на запити?', 'Ми відповідаємо на всі запити протягом робочого дня. Якщо питання термінове — телефонуйте, будь ласка.'], ['Чи можлива онлайн-консультація?', 'Так, ми проводимо консультації телефоном, у месенджерах або через відеозв’язок.'], ['Чи працюєте ви у вихідні?', 'За попереднім записом можливі консультації у вихідні та поза звичайним графіком.'], ['Як підготуватися до консультації?', 'Сформулюйте запит і, за можливості, підготуйте документи, що стосуються ситуації.']]
-  return <Layout><Hero title="Контакти" intro="Ми завжди на зв’язку, щоб надати вам професійну правову допомогу та відповісти на ваші питання. Зв’яжіться з нами зручним для вас способом або залиште заявку — ми відповімо найближчим часом." action="Зателефонувати" secondAction={{ label: 'Написати в Telegram', href: '/contacts#form' }} compact />
+  return <Layout><Hero title="Контакти" intro="Ми завжди на зв’язку, щоб надати вам професійну правову допомогу та відповісти на ваші питання. Зв’яжіться з нами зручним для вас способом або залиште заявку — ми відповімо найближчим часом." action="Зателефонувати" actionHref={contact.phoneHref} actionExternal secondAction={{ label: 'Написати в Telegram', href: 'https://t.me/kyivlegalgroup', external: true }} compact />
     <section className="section shell contact-form-layout"><article className="contacts-card"><SectionHeading>Наші контакти</SectionHeading><ContactDetails /></article><article className="form-card" id="form"><SectionHeading>Напишіть нам</SectionHeading><ConsultationForm /></article></section>
     <section className="section shell"><MapPlaceholder /></section>
-    <section className="section shell contact-lower"><article className="find-card"><h2>Як нас знайти</h2><div><TrainFront /><p><b>Метро</b>м. Олімпійська — 5 хв пішки<br />м. Палац Спорту — 7 хв пішки</p></div><div><CarFront /><p><b>На автомобілі</b>Зручний під’їзд з центру. Парковка у БЦ «Олімпійський» для відвідувачів.</p></div><div><CircleParking /><p><b>Паркування</b>Підземний паркінг БЦ «Олімпійський». В’їзд з вул. Жилянська.</p></div></article><article className="urgent-card"><Phone /><h2>Термінова консультація</h2><p>Потрібна невідкладна правова допомога? Зв’яжіться з нами — ми надамо швидке рішення.</p><a href={contact.phoneHref}>{contact.phone}</a><small>Пн – Пт: 09:00 – 18:00</small><Link className="btn btn--outline btn--full" to="/contacts#form">Зателефонувати зараз</Link><a className="telegram-link" href="https://t.me/kyivlegalgroup"><Send />Написати в Telegram</a></article><article className="faq-card"><h2>Поширені запитання</h2><FaqAccordion items={contactFaq} /></article></section>
+    <section className="section shell contact-lower"><article className="find-card"><h2>Як нас знайти</h2><div><TrainFront /><p><b>Метро</b>м. Олімпійська — 5 хв пішки<br />м. Палац Спорту — 7 хв пішки</p></div><div><CarFront /><p><b>На автомобілі</b>Зручний під’їзд з центру. Парковка у БЦ «Олімпійський» для відвідувачів.</p></div><div><CircleParking /><p><b>Паркування</b>Підземний паркінг БЦ «Олімпійський». В’їзд з вул. Жилянська.</p></div></article><article className="urgent-card"><Phone /><h2>Термінова консультація</h2><p>Потрібна невідкладна правова допомога? Зв’яжіться з нами — ми надамо швидке рішення.</p><a href={contact.phoneHref}>{contact.phone}</a><small>Пн – Пт: 09:00 – 18:00</small><a className="btn btn--outline btn--full" href={contact.phoneHref}>Зателефонувати зараз</a><a className="telegram-link" href="https://t.me/kyivlegalgroup"><Send />Написати в Telegram</a></article><article className="faq-card"><h2>Поширені запитання</h2><FaqAccordion items={contactFaq} /></article></section>
   </Layout>
 }
 
@@ -294,7 +367,7 @@ function LegalPage({ type }) {
 function NotFound() { return <Layout><section className="not-found shell"><h1>Сторінку не знайдено</h1><p>Можливо, вона була переміщена або посилання застаріло.</p><Link className="btn" to="/">На головну</Link></section></Layout> }
 
 function App() {
-  return <Routes><Route path="/" element={<HomePage />} /><Route path="/services" element={<ServicesPage />} /><Route path="/about" element={<AboutPage />} /><Route path="/advantages" element={<AdvantagesPage />} /><Route path="/reviews" element={<ReviewsPage />} /><Route path="/contacts" element={<ContactsPage />} /><Route path="/privacy" element={<LegalPage type="privacy" />} /><Route path="/offer" element={<LegalPage type="offer" />} /><Route path="*" element={<NotFound />} /></Routes>
+  return <Routes><Route path="/" element={<HomePage />} /><Route path="/services" element={<ServicesPage />} /><Route path="/services/:slug" element={<ServiceDetailPage />} /><Route path="/about" element={<AboutPage />} /><Route path="/advantages" element={<AdvantagesPage />} /><Route path="/reviews" element={<ReviewsPage />} /><Route path="/contacts" element={<ContactsPage />} /><Route path="/privacy" element={<LegalPage type="privacy" />} /><Route path="/offer" element={<LegalPage type="offer" />} /><Route path="*" element={<NotFound />} /></Routes>
 }
 
 export default App
