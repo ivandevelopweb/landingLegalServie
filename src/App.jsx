@@ -228,8 +228,22 @@ function ConsultationForm({ defaultTopic = '' }) {
   </form>
 }
 
-function CtaBand({ title = 'Потрібна правова підтримка?', button = 'Отримати консультацію' }) {
-  return <section className="cta-band"><span className="cta-band__icon"><ShieldCheck /></span><div><h2>{title}</h2><p>Зв’яжіться з нами — разом знайдемо найкраще рішення для вашої ситуації.</p></div><Link className="btn" to="/contacts#form">{button}</Link></section>
+function CtaBand({ title = 'Потрібна правова підтримка?' }) {
+  return <div className="cta-form">
+    <div className="cta-form__intro">
+      <span className="eyebrow">Зв’яжіться з нами</span>
+      <h2>{title}</h2>
+      <p>Опишіть вашу ситуацію — юрист відповість у робочий час і запропонує наступні кроки.</p>
+      <div className="cta-form__contacts">
+        <a href={contact.phoneHref}><Phone />{contact.phone}</a>
+        <a href={`mailto:${contact.email}`}><Mail />{contact.email}</a>
+      </div>
+    </div>
+    <div className="form-card cta-form__card">
+      <SectionHeading>Отримайте консультацію</SectionHeading>
+      <ConsultationForm />
+    </div>
+  </div>
 }
 
 function HomePage() {
