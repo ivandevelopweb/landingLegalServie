@@ -336,14 +336,32 @@ function ContactsPage() {
   const contactFaq = [['Як швидко ви відповідаєте на запити?', 'Ми відповідаємо на всі запити протягом робочого дня. Якщо питання термінове — телефонуйте, будь ласка.'], ['Чи можлива онлайн-консультація?', 'Так, ми проводимо консультації телефоном, у месенджерах або через відеозв’язок.'], ['Чи працюєте ви у вихідні?', 'За попереднім записом можливі консультації у вихідні та поза звичайним графіком.'], ['Як підготуватися до консультації?', 'Сформулюйте запит і, за можливості, підготуйте документи, що стосуються ситуації.']]
   return <Layout><Hero title="Контакти" intro="Ми завжди на зв’язку, щоб надати вам професійну правову допомогу та відповісти на ваші питання. Зв’яжіться з нами зручним для вас способом або залиште заявку — ми відповімо найближчим часом." action="Зателефонувати" actionHref={contact.phoneHref} actionExternal secondAction={{ label: 'Написати в Telegram', href: 'https://t.me/kyivlegalgroup', external: true }} compact />
     <section className="section shell contact-form-layout"><article className="contacts-card"><SectionHeading>Наші контакти</SectionHeading><ContactDetails /></article><article className="form-card" id="form"><SectionHeading>Напишіть нам</SectionHeading><ConsultationForm /></article></section>
-    <section className="section shell"><MapPlaceholder /></section>
+    <section className="section shell"><OfficeMap /></section>
     <section className="section shell contact-lower"><article className="find-card"><h2>Як нас знайти</h2><div><TrainFront /><p><b>Метро</b>м. Олімпійська — 5 хв пішки<br />м. Палац Спорту — 7 хв пішки</p></div><div><CarFront /><p><b>На автомобілі</b>Зручний під’їзд з центру. Парковка у БЦ «Олімпійський» для відвідувачів.</p></div><div><CircleParking /><p><b>Паркування</b>Підземний паркінг БЦ «Олімпійський». В’їзд з вул. Жилянська.</p></div></article><article className="urgent-card"><Phone /><h2>Термінова консультація</h2><p>Потрібна невідкладна правова допомога? Зв’яжіться з нами — ми надамо швидке рішення.</p><a href={contact.phoneHref}>{contact.phone}</a><small>Пн – Пт: 09:00 – 18:00</small><a className="btn btn--outline btn--full" href={contact.phoneHref}>Зателефонувати зараз</a><a className="telegram-link" href="https://t.me/kyivlegalgroup"><Send />Написати в Telegram</a></article><article className="faq-card"><h2>Поширені запитання</h2><FaqAccordion items={contactFaq} /></article></section>
   </Layout>
 }
 
 function ContactDetails() { return <div className="contact-details"><div><MapPin /><p><b>Адреса офісу</b>01001, м. Київ, вул. Велика Васильківська, 72, БЦ «Олімпійський», 7 поверх, офіс 708</p></div><div><Phone /><p><b>Телефон</b><a href={contact.phoneHref}>{contact.phone}</a></p></div><div><Mail /><p><b>Email</b><a href={`mailto:${contact.email}`}>{contact.email}</a></p></div><div><Send /><p><b>Telegram</b><a href="https://t.me/kyivlegalgroup">{contact.telegram}</a></p></div><div><Clock3 /><p><b>Графік роботи</b>Пн – Пт: 09:00 – 18:00<br />Сб – Нд: вихідні</p></div></div> }
 
-function MapPlaceholder() { return <div className="map-placeholder"><div className="map-line map-line--one" /><div className="map-line map-line--two" /><div className="map-line map-line--three" /><span className="map-pin"><Brand light /></span><b>Олімпійська</b><small>вул. Велика Васильківська</small></div> }
+function OfficeMap() {
+  const mapQuery = 'вул. Велика Васильківська, 72, Київ, Україна'
+  const encodedQuery = encodeURIComponent(mapQuery)
+
+  return <div className="office-map">
+    <iframe
+      title="Kyiv Legal Group на карті"
+      src={`https://www.google.com/maps?q=${encodedQuery}&output=embed`}
+      loading="lazy"
+      referrerPolicy="no-referrer-when-downgrade"
+      allowFullScreen
+    />
+    <a className="office-map__route" href={`https://www.google.com/maps/search/?api=1&query=${encodedQuery}`} target="_blank" rel="noreferrer">
+      <MapPin size={17} />
+      Побудувати маршрут
+      <ArrowRight size={16} />
+    </a>
+  </div>
+}
 
 const legalPrivacy = [
   ['Загальні положення', 'Ця Політика конфіденційності визначає порядок обробки та захисту персональних даних користувачів сайту kyivlegalgroup.ua. Ми поважаємо вашу приватність і забезпечуємо належний рівень захисту даних.'],
